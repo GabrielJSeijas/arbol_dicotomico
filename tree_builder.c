@@ -13,14 +13,16 @@ void build_dichotomic_tree(SpeciesList* list, const char* root_dir,
     if (!list || list->count == 0) {
         return;
     }
-    // Verificamos el orden de los traits
+
+    // Iteramos sobre todas las especies en la lista.
     for (int i = 0; i < list->count; i++) {
         
-        // Empezamos la ruta desde el directorio raíz para CADA especie
         char current_path[4096] = {0};
         strcpy(current_path, root_dir);
+        
+        bool path_creation_ok = true; // Bandera para saber si la ruta se creó sin errores.
 
-        // Iteramos sobre los traits de la especie actual
+        // Iteramos sobre los traits de la especie actual para crear su ruta de directorios.
         for (int j = 0; j < list->species[i].trait_count; j++) {
             const char* question = list->species[i].traits[j].name;
             bool answer = list->species[i].traits[j].value;
@@ -29,25 +31,24 @@ void build_dichotomic_tree(SpeciesList* list, const char* root_dir,
                                           answer ? true_text : false_text, 
                                           use_prefix, use_suffix);
             if (!dir_name) {
+                path_creation_ok = false;
                 break; // Salir si falla la alocación de memoria
             }
             
-            // Concatenamos el nombre del nuevo directorio a la ruta actual
             strcat(current_path, "/");
             strcat(current_path, dir_name);
             free(dir_name);
             
-            // Creamos el directorio
             if (!create_directory(current_path)) {
                 fprintf(stderr, "Error al crear el path para la especie '%s'. Abortando creación para esta especie.\n", list->species[i].name);
+                path_creation_ok = false;
                 break; 
             }
-            
-            // Si es el último trait de ESTA especie, creamos su archivo
-            if (j == list->species[i].trait_count - 1) {
-                create_species_file(current_path, list->species[i].name);
-            }
+        }
+
+        // Crear el archivo de la especie solo si la ruta se generó correctamente.
+        if (path_creation_ok) {
+            create_species_file(current_path, list->species[i].name);
         }
     }
 }
-

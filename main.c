@@ -9,7 +9,7 @@
 #include <string.h>
 
 // Definiciones de texto por defecto
-#define DEFAULT_TRUE_TEXT "si tiene"
+#define DEFAULT_TRUE_TEXT "sí tiene"
 #define DEFAULT_FALSE_TEXT "no tiene"
 
 // Este archivo contiene la lógica para manejar los argumentos de línea de comandos,
